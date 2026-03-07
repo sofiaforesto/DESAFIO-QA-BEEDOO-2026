@@ -1,187 +1,10 @@
 # DESAFIO-QA-BEEDOO-2026
 
-Repositório de análise e testes do módulo de cadastro e listagem de cursos da aplicação Beedoo QA Tests.
+Repositório de análise e testes do módulo de cadastro e listagem de cursos — Beedoo QA Tests.
 
 🔗 **Aplicação testada:** https://creative-sherbet-a51eac.netlify.app/
-
----
-
-## 1. Objetivo da Aplicação
-
-A aplicação **Beedoo QA Tests** é um ambiente web simples para **cadastro e listagem de cursos**. Seu objetivo é permitir que usuários:
-
-- Registrem novos cursos com informações como nome, descrição, instrutor, datas, vagas e tipo (presencial ou online)
-- Visualizem a lista de cursos cadastrados
-- Excluam cursos da lista
-
-> **Observação técnica:** A aplicação utiliza `localStorage` do navegador como mecanismo de persistência de dados (não há backend real). Os dados existem apenas no navegador local de quem cadastrou.
-
----
-
-## 2. Principais Fluxos Disponíveis
-
-### Fluxo 1 — Listagem de Cursos (`/`)
-- Exibe todos os cursos cadastrados em cards
-- Cada card mostra: imagem de capa, tipo do curso, nome, descrição, instrutor, datas, vagas e link/endereço
-- Botão "Excluir curso" disponível em cada card
-
-### Fluxo 2 — Cadastro de Curso (`/new-course`)
-- Formulário com os campos:
-  - **Nome do curso** (texto)
-  - **Descrição do curso** (textarea)
-  - **Instrutor** (texto)
-  - **Url da imagem de capa** (texto)
-  - **Data de início** (date picker)
-  - **Data de fim** (date picker)
-  - **Número de vagas** (número)
-  - **Tipo de curso** (select: Presencial / Online)
-    - Se **Presencial** → exibe campo "Endereço"
-    - Se **Online** → exibe campo "Link de inscrição"
-- Botão "Cadastrar curso" salva no localStorage e redireciona para a listagem
-
-### Fluxo 3 — Exclusão de Curso
-- Clique em "Excluir curso" no card chama uma API fictícia (`/test-api/courses/1`)
-- Exibe mensagem de sucesso, mas **não remove o item do localStorage**
-
----
-
-## 3. Pontos Mais Críticos para Teste
-
-| Prioridade | Área | Motivo |
-|-----------|------|--------|
-| 🔴 Alta | Validação de campos no cadastro | Nenhum campo possui validação — formulário aceita dados vazios ou inválidos |
-| 🔴 Alta | Funcionalidade de exclusão | O delete não remove o curso do localStorage; usa ID fixo (1) para chamada de API |
-| 🔴 Alta | Validação de datas | Data de fim pode ser anterior à data de início sem qualquer bloqueio |
-| 🟡 Média | Campos condicionais (Online/Presencial) | Dados preenchidos em um tipo podem persistir internamente ao trocar de tipo |
-| 🟡 Média | Número de vagas | Aceita valores negativos, zero e decimais |
-| 🟡 Média | URL da imagem de capa | Sem validação de formato; imagem quebrada não é tratada |
-| 🟢 Baixa | Geração de ID sequencial | Pode gerar IDs duplicados após exclusões bem-sucedidas |
-| 🟢 Baixa | Persistência de dados | Dados armazenados apenas em localStorage — perdidos ao limpar o browser |
-
----
-
-## 4. Cenários e Casos de Teste
-
-📊 **Planilha com todos os casos de teste:**
-> [Acessar Google Sheets — Casos de Teste](https://docs.google.com/spreadsheets/d/1BNAGhR3jvEy_KpSFPlt7W8mRy4xCZ_PV7n2NuW48Y_c/edit?usp=sharing)
-
----
-
-## 5. Evidências de Execução
-
-📁 **Pasta com evidências (prints e gravações):**
-> [Acessar Google Drive — Evidências](https://drive.google.com/drive/folders/placeholder)
-
----
-
-## 6. Bugs Registrados
-
-| # | Título | Severidade |
-|---|--------|------------|
-| BUG-001 | Formulário permite cadastro com todos os campos vazios | 🔴 Alta |
-| BUG-002 | Exclusão de curso não remove item da listagem (persiste no localStorage) | 🔴 Alta |
-| BUG-003 | Data de fim aceita datas anteriores à data de início | 🔴 Alta |
-| BUG-004 | Campo "Número de vagas" aceita valores negativos e zero | 🟡 Média |
-| BUG-005 | Campo "Url da imagem de capa" aceita qualquer texto sem validação de URL | 🟡 Média |
-| BUG-006 | Tipo de curso "Selecione..." permite cadastro sem selecionar tipo válido | 🟡 Média |
-| BUG-007 | Dados do campo condicional anterior persistem ao trocar tipo do curso | 🟢 Baixa |
-| BUG-008 | ID do curso gerado pode causar duplicatas após exclusões | 🟢 Baixa |
-
-> Detalhamento completo de cada bug na seção abaixo.
-
----
-
-## 7. Detalhamento dos Bugs
-
-### BUG-001 — Formulário permite cadastro com todos os campos vazios
-- **Passos para reproduzir:**
-  1. Acessar `/new-course`
-  2. Não preencher nenhum campo
-  3. Clicar em "Cadastrar curso"
-- **Resultado atual:** Curso é cadastrado com sucesso (mensagem verde exibida) e aparece na listagem com todos os campos em branco
-- **Resultado esperado:** Formulário deve validar campos obrigatórios (mínimo: nome, tipo, datas) e exibir mensagens de erro antes de permitir o cadastro
-- **Severidade:** 🔴 Alta
-
----
-
-### BUG-002 — Exclusão de curso não remove item da listagem
-- **Passos para reproduzir:**
-  1. Cadastrar ao menos um curso
-  2. Na listagem, clicar em "Excluir curso"
-  3. Confirmar mensagem de sucesso
-  4. Recarregar a página
-- **Resultado atual:** A mensagem "Curso excluído com sucesso!" é exibida, mas o curso permanece na listagem após recarregar. A chamada DELETE vai para `/test-api/courses/1` (ID fixo, não dinâmico) e não manipula o localStorage
-- **Resultado esperado:** O curso deve ser removido da listagem imediatamente e não reaparecer após recarregar
-- **Severidade:** 🔴 Alta
-
----
-
-### BUG-003 — Data de fim aceita datas anteriores à data de início
-- **Passos para reproduzir:**
-  1. Acessar `/new-course`
-  2. Preencher "Data de início" com 31/12/2025
-  3. Preencher "Data de fim" com 01/01/2025
-  4. Clicar em "Cadastrar curso"
-- **Resultado atual:** Curso cadastrado sem erro; data de fim é anterior à data de início
-- **Resultado esperado:** Sistema deve impedir cadastro quando data de fim for anterior à data de início, exibindo mensagem de erro
-- **Severidade:** 🔴 Alta
-
----
-
-### BUG-004 — Campo "Número de vagas" aceita valores negativos e zero
-- **Passos para reproduzir:**
-  1. Acessar `/new-course`
-  2. Inserir `-5` ou `0` no campo "Número de vagas"
-  3. Clicar em "Cadastrar curso"
-- **Resultado atual:** Curso cadastrado com -5 ou 0 vagas sem qualquer aviso
-- **Resultado esperado:** Campo deve aceitar apenas números inteiros positivos (≥ 1)
-- **Severidade:** 🟡 Média
-
----
-
-### BUG-005 — Campo "Url da imagem de capa" aceita qualquer texto
-- **Passos para reproduzir:**
-  1. Acessar `/new-course`
-  2. Inserir "isso não é uma url" no campo "Url da imagem de capa"
-  3. Cadastrar o curso
-  4. Ver o card na listagem
-- **Resultado atual:** Curso cadastrado; imagem aparece quebrada no card
-- **Resultado esperado:** Campo deve validar que o valor é uma URL válida (http/https) ou exibir preview da imagem antes do cadastro
-- **Severidade:** 🟡 Média
-
----
-
-### BUG-006 — Tipo "Selecione..." permite cadastro sem tipo válido
-- **Passos para reproduzir:**
-  1. Acessar `/new-course`
-  2. Não alterar o campo "Tipo de curso" (mantê-lo como "Selecione...")
-  3. Clicar em "Cadastrar curso"
-- **Resultado atual:** Curso cadastrado com `type: {label: "Selecione...", value: ""}` — sem tipo definido
-- **Resultado esperado:** Campo "Tipo de curso" deve ser obrigatório; sem seleção de Presencial ou Online, o cadastro não deve ser permitido
-- **Severidade:** 🟡 Média
-
----
-
-### BUG-007 — Dados de campo condicional persistem ao trocar tipo do curso
-- **Passos para reproduzir:**
-  1. Acessar `/new-course`
-  2. Selecionar "Presencial" e preencher o campo "Endereço" com "Rua das Flores, 123"
-  3. Mudar o tipo para "Online"
-  4. Preencher "Link de inscrição" e cadastrar
-- **Resultado atual:** O objeto salvo contém `address: "Rua das Flores, 123"` mesmo que o tipo seja Online (dado oculto mas persistido)
-- **Resultado esperado:** Ao trocar o tipo, o campo condicional anterior deve ser limpo/zerado no modelo de dados
-- **Severidade:** 🟢 Baixa
-
----
-
-### BUG-008 — ID sequencial pode gerar duplicatas
-- **Passos para reproduzir:**
-  1. Cadastrar 3 cursos (IDs 1, 2, 3)
-  2. Remover manualmente o curso de ID 2 do localStorage
-  3. Cadastrar um novo curso
-- **Resultado atual:** Novo curso recebe ID 3 (`length + 1 = 2 + 1 = 3`), duplicando o ID do curso existente
-- **Resultado esperado:** Sistema deve usar IDs únicos (UUID ou auto-increment baseado no maior ID existente, não no tamanho do array)
-- **Severidade:** 🟢 Baixa
+📊 **Planilha de casos de teste:** [Google Sheets — Casos de Teste](https://docs.google.com/spreadsheets/d/1BNAGhR3jvEy_KpSFPlt7W8mRy4xCZ_PV7n2NuW48Y_c/edit?usp=sharing)
+📁 **Evidências de execução:** [Google Drive — Prints e Gravações](https://drive.google.com/drive/folders/1i8TS7DL8z_GKjDhiEBtMQFPLfplFHzgd?usp=sharing)
 
 ---
 
@@ -189,13 +12,222 @@ A aplicação **Beedoo QA Tests** é um ambiente web simples para **cadastro e l
 
 ```
 DESAFIO-QA-BEEDOO-2026/
-├── README.md          # Este arquivo — análise, fluxos, bugs
+├── README.md                          ← Análise, fluxos, decisões, bugs
+├── etapa-2-respostas.md               ← Respostas da Etapa 2 (análise crítica)
 ├── test-cases/
-│   └── casos-de-teste.md   # Casos de teste em formato Gherkin + passo a passo
+│   ├── casos-de-teste.md              ← Casos de teste em Gherkin + passo a passo
+│   └── casos-de-teste.csv             ← Versão CSV para importação no Google Sheets
 └── bugs/
-    └── bug-report.md       # Relatório consolidado de bugs
+    └── bug-report.md                  ← Relatório detalhado de todos os bugs
 ```
 
 ---
 
+## 1. Análise Inicial da Aplicação
+
+### O que é a aplicação?
+
+A **Beedoo QA Tests** é um ambiente web para **cadastro e listagem de cursos**. É uma Single Page Application (SPA) construída com **Vue.js + Quasar Framework**, hospedada no Netlify.
+
+> **Detalhe técnico importante descoberto na análise:** A aplicação não possui backend real. Toda a persistência de dados ocorre via `localStorage` do navegador, usando a chave `@beedoo-qa-tests/courses`. Isso significa que os dados existem apenas no navegador local — não há sincronização entre dispositivos.
+
+### Como descobri isso?
+
+Como a aplicação é uma SPA renderizada via JavaScript, o conteúdo não está disponível no HTML estático. Analisei diretamente os **bundles JavaScript** gerados pelo build (`CourseForm.afe3ffdb.js`, `IndexPage.da5f52bb.js`) para entender a lógica interna sem depender de um browser. Esse processo revelou:
+
+- A estrutura de dados de cada curso
+- A lógica de geração de ID (sequential length-based)
+- O uso de localStorage como única camada de persistência
+- Uma chamada DELETE hardcoded para `/test-api/courses/1`
+- A ausência total de validação no formulário
+
+---
+
+## 2. Principais Fluxos Disponíveis
+
+### Fluxo 1 — Listagem de Cursos (`/`)
+- Lê cursos do `localStorage` e os exibe em cards
+- Cada card mostra: imagem de capa, tipo do curso, nome, descrição, instrutor, datas, vagas e link/endereço
+- Botão "Excluir curso" em cada card
+
+### Fluxo 2 — Cadastro de Curso (`/new-course`)
+Formulário com os campos:
+
+| Campo | Tipo | Condicional |
+|-------|------|-------------|
+| Nome do curso | Texto | Sempre visível |
+| Descrição do curso | Textarea | Sempre visível |
+| Instrutor | Texto | Sempre visível |
+| Url da imagem de capa | Texto | Sempre visível |
+| Data de início | Date | Sempre visível |
+| Data de fim | Date | Sempre visível |
+| Número de vagas | Número | Sempre visível |
+| Tipo de curso | Select (Presencial/Online) | Sempre visível |
+| Endereço | Texto | Apenas se Presencial |
+| Link de inscrição | Texto | Apenas se Online |
+
+### Fluxo 3 — Exclusão de Curso
+- Botão "Excluir curso" no card chama `DELETE /test-api/courses/1` (ID fixo)
+- Exibe notificação de sucesso mas **não remove do localStorage**
+
+---
+
+## 3. Pontos Mais Críticos para Teste
+
+| Prioridade | Área | Por que é crítico |
+|-----------|------|-------------------|
+| 🔴 Alta | Validação de campos | Nenhum campo possui validação — formulário aceita dados vazios |
+| 🔴 Alta | Exclusão de curso | Não funciona — ID hardcoded e localStorage não atualizado |
+| 🔴 Alta | Validação de datas | Data de fim pode ser anterior à data de início |
+| 🟡 Média | Campos condicionais | Dados ocultos persistem no objeto ao trocar tipo |
+| 🟡 Média | Número de vagas | Aceita negativos, zero e decimais |
+| 🟡 Média | URL da imagem | Sem validação de formato — gera imagens quebradas |
+| 🟢 Baixa | Geração de ID | Pode duplicar IDs após exclusões |
+
+---
+
+## 4. Decisões Tomadas para Criação dos Testes
+
+### Por que analisar o código-fonte antes de testar?
+
+A primeira decisão foi **ir além da interface visual** e inspecionar os arquivos JavaScript do bundle. Isso permitiu:
+
+1. Entender a estrutura exata dos dados — sem precisar executar todos os cenários manualmente
+2. Identificar bugs que não são visíveis na UI (como o ID hardcoded no DELETE e a persistência de campos ocultos)
+3. Mapear todos os campos existentes, incluindo os condicionais, antes de abrir o formulário
+
+Essa abordagem é especialmente útil em SPAs onde o comportamento está encapsulado no JS e não é aparente apenas olhando para a tela.
+
+### Critérios para seleção dos cenários
+
+Priorizei cenários baseado em **risco x probabilidade**:
+
+- **Alto risco, alta probabilidade:** Fluxos principais (cadastro, listagem, exclusão) — testados primeiro e com maior detalhe
+- **Alto risco, baixa probabilidade:** Segurança (XSS, injeção) — testados mas com menor profundidade dado o escopo do desafio
+- **Baixo risco, alta probabilidade:** Edge cases de campos (caracteres especiais, texto longo) — incluídos para completude
+- **Baixo risco, baixa probabilidade:** Bugs de estado interno (ID duplicado) — documentados mas com menor prioridade
+
+### Formato dos casos de teste
+
+Escolhi **Gherkin** como formato primário por três razões:
+1. É legível por pessoas técnicas e não-técnicas (produto, dev, stakeholders)
+2. Força a pensar em pré-condições, ações e resultados esperados de forma estruturada
+3. Serve como base para automação futura com frameworks como Cypress/Playwright
+
+Para casos mais técnicos (análise de estado interno), complementei com **passo a passo estruturado**.
+
+---
+
+## 5. Raciocínio Durante a Análise
+
+### Como pensei nos cenários negativos?
+
+Para cada campo do formulário, me fiz três perguntas:
+1. **O que acontece se eu não preencher?** → Testou ausência (CT-004, CT-005)
+2. **O que acontece se eu preencher com dados inválidos?** → Testou formato e limites (CT-007, CT-008, CT-009, CT-018)
+3. **O que acontece em situações limite?** → Testou valores extremos e combinações (CT-015, CT-016, CT-017)
+
+### Por que testei a exclusão com reload?
+
+A exclusão sem reload poderia passar em memória mesmo sem persistir. O reload foi essencial para confirmar se o dado foi realmente removido do localStorage ou apenas ocultado temporariamente na UI.
+
+### Como identifiquei o bug do DELETE hardcoded?
+
+Ao analisar o JavaScript, encontrei:
+```javascript
+fetch("/test-api/courses/1", { method: "DELETE" })
+```
+O ID `1` está literalmente no código-fonte — não é dinâmico. Isso significa que independentemente de qual curso o usuário clica para excluir, a chamada sempre vai para o ID 1. Combinado com o fato de que o localStorage não é atualizado após o DELETE, a exclusão é completamente não-funcional.
+
+---
+
+## 6. Cenários e Casos de Teste
+
+📊 **[Acessar Google Sheets — Casos de Teste](https://docs.google.com/spreadsheets/d/1BNAGhR3jvEy_KpSFPlt7W8mRy4xCZ_PV7n2NuW48Y_c/edit?usp=sharing)**
+
+| Resultado | Quantidade |
+|-----------|-----------|
+| ✅ Passou | 9 |
+| ❌ Falhou | 10 |
+| ⚠️ Parcial | 1 |
+| **Total** | **20** |
+
+Resumo dos cenários cobertos:
+- Fluxos positivos de cadastro (Online e Presencial)
+- Validações de campos obrigatórios
+- Validação de datas
+- Limites e valores inválidos (negativo, zero, decimal, texto longo)
+- Campos condicionais e troca de tipo
+- Exclusão de cursos
+- Segurança (XSS)
+- Navegação e rotas
+- Persistência de dados
+
+---
+
+## 7. Relatório de Bugs
+
+📄 **[Ver relatório completo em `/bugs/bug-report.md`](./bugs/bug-report.md)**
+
+### Resumo
+
+| ID | Título | Severidade |
+|----|--------|------------|
+| BUG-001 | Formulário permite cadastro com todos os campos vazios | 🔴 Alta |
+| BUG-002 | Exclusão de curso não remove item do localStorage | 🔴 Alta |
+| BUG-003 | Data de fim aceita datas anteriores à data de início | 🔴 Alta |
+| BUG-004 | Número de vagas aceita negativo, zero e decimal | 🟡 Média |
+| BUG-005 | URL da imagem de capa sem validação de formato | 🟡 Média |
+| BUG-006 | Tipo "Selecione..." aceito no cadastro | 🟡 Média |
+| BUG-007 | Dados de campo condicional persistem ao trocar tipo | 🟢 Baixa |
+| BUG-008 | Geração de ID pode criar duplicatas | 🟢 Baixa |
+
+### Exemplo de bug (BUG-002 — o mais crítico)
+
+**Título:** Botão "Excluir curso" não remove curso do localStorage
+
+**Passos para reproduzir:**
+1. Cadastrar um curso em `/new-course`
+2. Acessar a listagem `/`
+3. Clicar em "Excluir curso"
+4. Observar a notificação de sucesso
+5. Recarregar a página (F5)
+
+**Resultado atual:** Notificação verde exibida, mas o curso permanece após recarregar. A chamada DELETE vai para `/test-api/courses/1` (ID fixo) e não manipula o localStorage.
+
+**Resultado esperado:** Curso removido do localStorage imediatamente e não reaparecer após reload.
+
+**Severidade:** Alta — funcionalidade de exclusão completamente não-funcional com feedback falso ao usuário.
+
+---
+
+## 8. Evidências de Execução
+
+📁 **[Acessar Google Drive — Prints e Gravações](https://drive.google.com/drive/folders/1i8TS7DL8z_GKjDhiEBtMQFPLfplFHzgd?usp=sharing)**
+
+Conteúdo da pasta de evidências:
+- `CT-001` — Cadastro válido (Online): print do formulário preenchido + card na listagem
+- `CT-004` — Cadastro com campos vazios: print mostrando curso vazio na listagem (BUG-001)
+- `CT-006` — Datas invertidas: print do card com data de fim anterior ao início (BUG-003)
+- `CT-007` — Vagas negativas: print do card com -5 vagas (BUG-004)
+- `CT-013` — Exclusão fake: print do localStorage via DevTools mostrando curso ainda presente após exclusão (BUG-002)
+- `CT-016` — Tentativa de XSS: print mostrando texto escapado corretamente
+
+---
+
+## Etapa 2 — Análise Crítica
+
+📄 **[Ver respostas completas em `/etapa-2-respostas.md`](./etapa-2-respostas.md)**
+
+Inclui:
+1. Análise do bug 404 ao acessar curso por URL direta
+2. Vulnerabilidades identificadas (XSS, localStorage tampering, ausência de autenticação)
+3. Pontos críticos a esclarecer com produto/dev antes de testar
+4. Metodologia de investigação de defeitos
+5. Priorização de testes em 15 minutos
+6. Reflexão sobre o desafio
+
+---
+
 *Desafio realizado por Sofia Foresto | Beedoo QA 2026*
+*Prazo de entrega: 11/03/2026*

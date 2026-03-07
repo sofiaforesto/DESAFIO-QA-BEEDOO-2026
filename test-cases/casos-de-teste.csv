@@ -1,0 +1,57 @@
+ID,Título,Módulo,Tipo,Prioridade,Pré-condições,Passos,Resultado Esperado,Resultado Atual,Status,Bug Relacionado
+CT-001,Cadastro de curso Online com dados válidos (fluxo feliz),Cadastro (/new-course),Positivo,Alta,Usuário está na página /new-course,"1. Preencher Nome: 'Curso de Introdução ao QA'
+2. Preencher Descrição: 'Aprenda os fundamentos de QA'
+3. Preencher Instrutor: 'Ana Lima'
+4. Preencher URL da imagem: 'https://picsum.photos/400/200'
+5. Preencher Data de início: 01/04/2025
+6. Preencher Data de fim: 01/05/2025
+7. Preencher Número de vagas: 30
+8. Selecionar Tipo: Online
+9. Preencher Link de inscrição: 'https://inscricao.beedoo.com/qa'
+10. Clicar em 'Cadastrar curso'","Mensagem 'Curso cadastrado com sucesso!' exibida. Usuário redirecionado para /. Curso aparece na listagem com todos os dados corretos.","Curso cadastrado e listado corretamente.",PASSOU,—
+CT-002,Cadastro de curso Presencial com endereço,Cadastro (/new-course),Positivo,Alta,Usuário está na página /new-course,"1. Preencher campos básicos (nome, descrição, instrutor, imagem, datas, vagas)
+2. Selecionar Tipo: Presencial
+3. Verificar exibição do campo Endereço
+4. Preencher Endereço: 'Av. Paulista, 1000 - SP'
+5. Clicar em 'Cadastrar curso'","Campo Endereço exibido ao selecionar Presencial. Campo Link de inscrição não exibido. Curso cadastrado com endereço visível no card.","Campos condicionais exibidos corretamente. Curso cadastrado.",PASSOU,—
+CT-003,Seleção de tipo Online exibe campo Link de inscrição,Cadastro (/new-course),Positivo,Alta,Usuário está na página /new-course,"1. Acessar /new-course
+2. Selecionar Tipo: Online","Campo 'Link de inscrição' exibido. Campo 'Endereço' não exibido.","Comportamento correto.",PASSOU,—
+CT-004,Cadastro com todos os campos vazios,Cadastro (/new-course),Negativo,Alta,Usuário está na página /new-course,"1. Não preencher nenhum campo
+2. Clicar em 'Cadastrar curso'","Mensagens de validação exibidas nos campos obrigatórios. Cadastro não realizado.","Curso cadastrado com todos os campos vazios. Nenhuma validação exibida.",FALHOU,BUG-001
+CT-005,Cadastro sem preencher o nome do curso,Cadastro (/new-course),Negativo,Alta,Usuário está na página /new-course,"1. Preencher todos os campos exceto 'Nome do curso'
+2. Clicar em 'Cadastrar curso'","Mensagem de erro 'Nome do curso é obrigatório'. Cadastro bloqueado.","Curso cadastrado sem nome.",FALHOU,BUG-001
+CT-006,Data de fim anterior à data de início,Cadastro (/new-course),Negativo,Alta,Usuário está na página /new-course,"1. Preencher Data de início: 31/12/2025
+2. Preencher Data de fim: 01/01/2025
+3. Clicar em 'Cadastrar curso'","Erro: 'Data de fim não pode ser anterior à data de início'. Cadastro bloqueado.","Curso cadastrado com datas invertidas.",FALHOU,BUG-003
+CT-007,Número de vagas negativo,Cadastro (/new-course),Negativo,Média,Usuário está na página /new-course,"1. Inserir -5 no campo 'Número de vagas'
+2. Clicar em 'Cadastrar curso'","Erro: 'Número de vagas deve ser maior que zero'. Cadastro bloqueado.","Curso cadastrado com -5 vagas.",FALHOU,BUG-004
+CT-008,Número de vagas igual a zero,Cadastro (/new-course),Negativo,Média,Usuário está na página /new-course,"1. Inserir 0 no campo 'Número de vagas'
+2. Clicar em 'Cadastrar curso'","Erro de validação. Cadastro bloqueado.","Curso cadastrado com 0 vagas.",FALHOU,BUG-004
+CT-009,URL da imagem de capa inválida,Cadastro (/new-course),Negativo,Média,Usuário está na página /new-course,"1. Inserir 'texto-sem-url' no campo 'Url da imagem de capa'
+2. Clicar em 'Cadastrar curso'
+3. Verificar o card na listagem","Erro de URL inválida ou imagem carregada corretamente no preview.","Curso cadastrado. Imagem aparece quebrada na listagem.",FALHOU,BUG-005
+CT-010,Cadastro sem selecionar tipo de curso,Cadastro (/new-course),Negativo,Média,Usuário está na página /new-course,"1. Manter 'Tipo de curso' como 'Selecione...'
+2. Preencher demais campos
+3. Clicar em 'Cadastrar curso'","Erro: 'Selecione um tipo de curso'. Cadastro bloqueado.","Curso cadastrado com tipo inválido (value: '').",FALHOU,BUG-006
+CT-011,Visualização da listagem de cursos cadastrados,Listagem (/),Positivo,Alta,"Ao menos um curso cadastrado no sistema","1. Acessar a página /","Todos os cursos são exibidos em cards com: tipo, nome, descrição, instrutor, datas, vagas e botão Excluir.","Cursos listados corretamente.",PASSOU,—
+CT-012,Listagem vazia quando não há cursos,Listagem (/),Positivo,Média,localStorage limpo,"1. Limpar localStorage
+2. Acessar /","Mensagem amigável de estado vazio exibida (ex.: 'Nenhum curso cadastrado').","Página exibe apenas o título 'Lista de cursos' sem mensagem de estado vazio. UX pode melhorar.",PASSOU PARCIALMENTE,—
+CT-013,Excluir curso da listagem,Listagem (/),Negativo,Alta,"Ao menos um curso cadastrado","1. Clicar em 'Excluir curso' em um card
+2. Verificar a listagem
+3. Recarregar a página (F5)","Curso removido imediatamente da listagem. Após reload, curso não aparece mais.","Notificação de sucesso exibida, mas curso permanece na listagem após reload.",FALHOU,BUG-002
+CT-014,Múltiplos cursos cadastrados e listados,Listagem (/),Positivo,Alta,Nenhuma,"1. Cadastrar 3 cursos com dados diferentes
+2. Acessar a listagem /","Todos os 3 cursos aparecem na listagem.","Todos os cursos listados corretamente.",PASSOU,—
+CT-015,Trocar tipo de curso de Presencial para Online,Cadastro (/new-course),Negativo,Baixa,Usuário está na página /new-course,"1. Selecionar Presencial
+2. Preencher Endereço: 'Rua A, 100'
+3. Trocar para Online
+4. Cadastrar o curso","Campo Endereço oculto. Dado do endereço limpo do objeto interno.","Campo oculto corretamente, mas valor address persiste no objeto salvo.",FALHOU,BUG-007
+CT-016,Campos com caracteres especiais e tentativa de XSS,Cadastro (/new-course),Segurança,Baixa,Usuário está na página /new-course,"1. Preencher nome com: <script>alert('xss')</script>
+2. Cadastrar o curso
+3. Verificar na listagem","Texto exibido como literal. Nenhum script executado.","Texto exibido com escape correto pelo Vue.js. Sem XSS.",PASSOU,—
+CT-017,Campo descrição com texto muito longo,Cadastro (/new-course),Positivo,Baixa,Usuário está na página /new-course,"1. Inserir 5000 caracteres no campo Descrição
+2. Cadastrar e verificar na listagem","Texto aceito e exibido sem quebrar o layout.","Comportamento correto.",PASSOU,—
+CT-018,Número de vagas com valor decimal,Cadastro (/new-course),Negativo,Média,Usuário está na página /new-course,"1. Inserir 10.5 no campo 'Número de vagas'
+2. Cadastrar o curso","Erro: 'Número de vagas deve ser um número inteiro'. Cadastro bloqueado.","Curso cadastrado com 10.5 vagas.",FALHOU,BUG-004
+CT-019,Acessar rota inexistente (404),Navegação,Positivo,Baixa,Nenhuma,"1. Acessar /rota-que-nao-existe","Página de erro 404 amigável exibida.","Página 404 exibida corretamente pelo framework.",PASSOU,—
+CT-020,Persistência de dados após recarregar a página,Listagem (/),Positivo,Alta,"Ao menos um curso cadastrado","1. Cadastrar um curso
+2. Recarregar a página (F5)","Curso continua aparecendo na listagem.","Dados persistem no localStorage e carregados corretamente após reload.",PASSOU,—
