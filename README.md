@@ -55,7 +55,7 @@ A aplicação utiliza **Vue.js 3 + Quasar Framework** no front-end e **localStor
 
 Os casos de teste estão documentados na planilha do Google Sheets:
 
-📊 **[Casos de Teste — Google Sheets](https://docs.google.com/spreadsheets/d/1_PLACEHOLDER_LINK)**
+📊 **[Casos de Teste — Google Sheets](https://docs.google.com/spreadsheets/d/1pkiP5jzVziEoXLZSwlOSgP-rk9yFM7GPUUi-2xUpVVU/edit)**
 
 > *(Substituir pelo link real após criação da planilha)*
 
