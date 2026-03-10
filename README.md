@@ -57,8 +57,6 @@ Os casos de teste estão documentados na planilha do Google Sheets:
 
 📊 **[Casos de Teste — Google Sheets](https://docs.google.com/spreadsheets/d/1pkiP5jzVziEoXLZSwlOSgP-rk9yFM7GPUUi-2xUpVVU/edit)**
 
-> *(Substituir pelo link real após criação da planilha)*
-
 ### Resumo dos Cenários
 
 | ID | Cenário | Tipo | Resultado |
